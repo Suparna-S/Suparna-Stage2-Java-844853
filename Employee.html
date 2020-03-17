@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>EmployeeDataBase</title>
+</head>
+<body>
+<form action=EmployeeServlet1 method = "POST" style="position: absolute;left: 40%;margin-top: 2% " >
+<H1>Employee Data Entry</H1>
+<table style="border: solid 5px; border-radius:10px ;border-color:teal ;">
+<tr><td>Employee ID:</td>
+<td><input type = "text" name = "id" required="required"/></td></tr>
+<tr><td>Employee Name:</td>
+<td><input type = "text" name = "name" required="required"/></td></tr>
+<tr><td>Employee Salary:</td>
+<td><input type = "text" name = "salary" /></td></tr>
+</table>
+<input type="submit" style="border-radius: 40%;background-color:green ;color: white; position: absolute;left: 35%; " value="Submit Record"/>
+<input type="reset" style="border-radius: 40%;background-color:maroon ;color: white;position: absolute;left: 72%;" value="Clear Form" />
+</form>
+
+<form action=EmployeeServlet1 method = "GET" style="position: absolute;left: 41%;margin-top: 15% " >
+<H1>Search An Employee</H1>
+<table style="border: solid 5px; border-radius:10px ;border-color:teal ;">
+<tr><td>By ID:</td>
+<td><input type = "text" name = "searchid" /></td></tr>
+<tr><td>By Name:</td>
+<td><input type = "text" name = "searchname" /></td></tr>
+<tr><td>By Salary:</td>
+<td><input type = "text" name = "searchsalary" /></td></tr>
+</table>
+<input type="submit" style="border-radius: 40%;background-color:green ;color: white; position: absolute;left: 25%; " value="Search Record"/>
+<input type="reset" style="border-radius: 40%;background-color:maroon ;color: white;position: absolute;left: 63%;" value="Clear Entries" />
+</form>
+
+<form action=EmployeeServlet2 method = "GET" style="position: absolute;left: 41%;margin-top: 30% " >
+<H1>Delete a Record</H1>
+<table style="border: solid 5px; border-radius:10px ;border-color:teal ;">
+<tr><td>By Name:</td>
+<td><input type = "text" name = "deletename" /></td></tr>
+</table>
+<input type="submit" style="border-radius: 40%;background-color:red ;color: white; position: absolute;left: 16%; " value="Remove Record"/>
+<input type="reset" style="border-radius: 40%;background-color:green ;color: white;position: absolute;left: 63%;" value="Clear Entries" />
+</form>
+</body>
+</html>
