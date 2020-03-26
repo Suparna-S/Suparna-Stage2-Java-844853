@@ -1,0 +1,198 @@
+package com.pojo;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+/*
+ * many-to-one relationship
+ * :
+ * many employees can have the (one)same company address.
+ Many Vehicle belong to person(user)
+ */
+@Entity
+@Table(name = "manyemp12")
+public class ManyEmp 
+{
+	@Id
+	 @SequenceGenerator(name = "mySeqGen", sequenceName = "mySeq", initialValue = 100)
+	@GeneratedValue(generator = "mySeqGen")
+	@Column(name = "eid")
+int eid;
+	@Column(name = "ename", nullable = false, length = 100)
+	String name;
+	@ManyToOne(cascade = CascadeType.ALL)
+	CompanyAddress addr1;
+	public ManyEmp(String name, CompanyAddress addr1) {
+		super();
+		this.name = name;
+		this.addr1 = addr1;
+	}
+	public int getEid() {
+		return eid;
+	}
+	public void setEid(int eid) {
+		this.eid = eid;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public CompanyAddress getAddr1() {
+		return addr1;
+	}
+	public void setAddr1(CompanyAddress addr1) {
+		this.addr1 = addr1;
+	}
+	
+}
+====================================================================
+package com.pojo;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "comp_address12")
+public class CompanyAddress 
+{
+	@Id	 
+	@SequenceGenerator(name = "mySeqGen1", sequenceName = "mySeq1", initialValue = 10)
+	@GeneratedValue(generator = "mySeqGen1")
+	@Column(name = "ADDRESS_ID")
+	int addrid;
+	@Column(name = "add_city", nullable = false, length=250)
+String city;
+	@Column(name = "add_state", nullable = false, length=250)
+String state;
+	public CompanyAddress(String city, String state) {
+		super();
+		this.city = city;
+		this.state = state;
+	}
+	public int getAddrid() {
+		return addrid;
+	}
+	public void setAddrid(int addrid) {
+		this.addrid = addrid;
+	}
+	public String getCity() {
+		return city;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	public String getState() {
+		return state;
+	}
+	public void setState(String state) {
+		this.state = state;
+	}
+
+}
+=====================================================================================
+package com.dao;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
+
+import com.pojo.CompanyAddress;
+import com.pojo.ManyEmp;
+
+public class ManyToOne 
+{
+	public static void main(String[] args) {
+	Session s=new Configuration().configure("cts_hibernate.cfg.xml").buildSessionFactory().openSession();
+	Transaction t=s.beginTransaction();
+	CompanyAddress address = new CompanyAddress("Navalur Chennai", "TN");
+	//By using cascade=all option the address need not be 
+	//saved explicitly when the employee 
+	//object is persisted the address will be automatically saved.
+	            //session.save(address);//not needed
+	ManyEmp s1 = new ManyEmp("Kani", address);
+	ManyEmp s2 = new ManyEmp("Thananya", address);
+	s.save(s1);
+	s.save(s2);
+	t.commit();
+	}
+
+}
+==============================================================
+    <mapping class="com.pojo.ManyEmp"/>
+       <mapping class="com.pojo.CompanyAddress"/>
+   
+==================================================================
+mysql> select * from manyemp12;
++-----+----------+------------------+
+| eid | ename    | addr1_ADDRESS_ID |
++-----+----------+------------------+
+| 251 | Kani     |              111 |
+| 252 | Thananya |              111 |
++-----+----------+------------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from comp_address12;
++------------+-----------------+-----------+
+| ADDRESS_ID | add_city        | add_state |
++------------+-----------------+-----------+
+|        111 | Navalur Chennai | TN        |
++------------+-----------------+-----------+
+1 row in set (0.00 sec)
+
+mysql> desc manyemp12;
++------------------+--------------+------+-----+---------+-------+
+| Field            | Type         | Null | Key | Default | Extra |
++------------------+--------------+------+-----+---------+-------+
+| eid              | int(11)      | NO   | PRI | NULL    |       |
+| ename            | varchar(100) | NO   |     | NULL    |       |
+| addr1_ADDRESS_ID | int(11)      | YES  | MUL | NULL    |       |
++------------------+--------------+------+-----+---------+-------+
+3 rows in set (0.01 sec)
+
+mysql> desc comp_address12;
++------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| ADDRESS_ID | int(11)      | NO   | PRI | NULL    |       |
+| add_city   | varchar(250) | NO   |     | NULL    |       |
+| add_state  | varchar(250) | NO   |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+3 rows in set (0.01 sec)
+
+mysql>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

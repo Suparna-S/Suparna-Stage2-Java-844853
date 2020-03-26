@@ -1,0 +1,285 @@
+package com.pojo;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+
+/*
+ * Emp table:
+ * Meeting table:
+ * Emp_Meeting table:(joined table)
+Many-To-Many association, an extra table is used 
+(known as Joined table) whose primary key is the 
+combination of the primary key of both the associated 
+tables. 
+
+In other words, there is a foreign key association 
+between the joined table and the associated tables. 
+*/
+@Entity
+@Table(name="employeemany1")
+public class Employee_ManyPojo {
+
+	@Id
+	@Column(name="employee_id")
+	@GeneratedValue//autoincrement
+	private Long employeeId;
+
+	@Column(name="firstname")
+	private String firstname;
+
+	@Column(name="lastname")
+	private String lastname;
+
+	//3rd table
+	//employee_id--Employee_ManyPojo
+	//meeting_id--Meetings_Pojo
+	@ManyToMany(cascade = {CascadeType.ALL})
+	@JoinTable(name="employee_meetingmany1", 
+	joinColumns= {@JoinColumn(name="employee_id")},  
+	inverseJoinColumns= {@JoinColumn(name="meeting_id")})
+	private Set<Meetings_Pojo> meetings = new HashSet<Meetings_Pojo>();
+
+	public Employee_ManyPojo() { }
+
+	public Employee_ManyPojo(String first_name, String last_name) {
+		this.firstname = first_name;
+		this.lastname = last_name;
+	}
+
+	public Long getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(Long employee_id) {
+		this.employeeId = employee_id;
+	}
+
+	public String getFirstname() {
+		return firstname;
+	}
+
+	public void setFirstname(String first_name) {
+		this.firstname = first_name;
+	}
+
+	public String getLastname() {
+		return lastname;
+	}
+
+	public void setLastname(String last_name) {
+		this.lastname = last_name;
+	}
+
+	public Set<Meetings_Pojo> getMeetings() {
+		return meetings;
+	}
+
+	public void setMeetings(Set<Meetings_Pojo> meetings) {
+		this.meetings = meetings;
+	}
+}
+==================================================
+package com.pojo;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+@Entity
+@Table(name="meetingmany1")
+/*
+ * MYSQL CREATE 3 TABLES
+ * employeemany1
+ * meetingmany1
+ * employee_meetingmany1(joined table)
+ */
+public class Meetings_Pojo {
+
+	@Id
+	@Column(name="meeting_id")
+	@GeneratedValue
+	private Long meetingId;
+
+	@Column(name="subject")
+	private String subject;
+
+	@Column(name="meeting_date")
+	private Date meetingDate;
+//meetings==Employee_ManyPojo(Set)
+	@ManyToMany(mappedBy="meetings")
+	private Set<Employee_ManyPojo> employees = new HashSet<Employee_ManyPojo>();
+
+	public Meetings_Pojo() { }
+
+	public Meetings_Pojo(String subject) {
+		this.subject = subject;
+		this.meetingDate = new Date();
+	}
+
+	public Long getMeetingId() {
+		return meetingId;
+	}
+
+	public void setMeetingId(Long meeting_id) {
+		this.meetingId = meeting_id;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject_name) {
+		this.subject = subject_name;
+	}
+
+	public Date getMeetingDate() {
+		return meetingDate;
+	}
+
+	public void setMeetingDate(Date meeting_date) {
+		this.meetingDate = meeting_date;
+	}
+
+	public Set<Employee_ManyPojo> getEmployees() {
+		return employees;
+	}
+
+	public void setEmployees(Set<Employee_ManyPojo> employees) {
+		this.employees = employees;
+	}
+}
+==========================================================================
+package com.dao;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
+
+import com.pojo.Employee_ManyPojo;
+import com.pojo.Meetings_Pojo;
+
+public class ManyToManyMain {
+
+	public static void main(String[] args) {
+		Session s=new Configuration().configure("cts_hibernate.cfg.xml").buildSessionFactory().openSession();
+		Transaction t=s.beginTransaction();
+	
+		Meetings_Pojo quaterlyMeet = new Meetings_Pojo("Quaterly Status Meeting");
+		Meetings_Pojo weeklyMeet = new Meetings_Pojo("Weekly Status Meeting");
+		Meetings_Pojo dailyMeet  = new Meetings_Pojo("Daily Status Meeting");
+
+		Employee_ManyPojo empObj1 = new Employee_ManyPojo("Devi", "Priya");
+		empObj1.getMeetings().add(quaterlyMeet);
+		empObj1.getMeetings().add(weeklyMeet);
+		s.save(empObj1);
+
+		Employee_ManyPojo empObj2 = new Employee_ManyPojo("Thananya", "Daya");
+		empObj2.getMeetings().add(quaterlyMeet);
+		s.save(empObj2);
+
+		Employee_ManyPojo empObj3 = new Employee_ManyPojo("Abi", "Lakshmi");			
+		empObj3.getMeetings().add(weeklyMeet);
+		empObj3.getMeetings().add(dailyMeet);
+		s.save(empObj3);
+
+		// Committing The Transactions To The Database
+		s.getTransaction().commit();
+
+		System.out.println("\n.......Records Saved Successfully To The Database.......");
+	} 
+}
+================================================================
+mysql> use test
+Database changed
+mysql> select * from employeemany1;
++-------------+-----------+----------+
+| employee_id | firstname | lastname |
++-------------+-----------+----------+
+|          13 | Devi      | Priya    |
+|          16 | Thananya  | Daya     |
+|          17 | Abi       | Lakshmi  |
++-------------+-----------+----------+
+3 rows in set (0.00 sec)
+
+mysql> select * from meetingmany1;
++------------+---------------------+-------------------------+
+| meeting_id | meeting_date        | subject                 |
++------------+---------------------+-------------------------+
+|         14 | 2020-03-25 10:16:35 | Weekly Status Meeting   |
+|         15 | 2020-03-25 10:16:35 | Quaterly Status Meeting |
+|         18 | 2020-03-25 10:16:35 | Daily Status Meeting    |
++------------+---------------------+-------------------------+
+3 rows in set (0.00 sec)
+
+mysql> select * from employee_meetingmany1;
++-------------+------------+
+| employee_id | meeting_id |
++-------------+------------+
+|          13 |         14 |
+|          17 |         14 |
+|          13 |         15 |
+|          16 |         15 |
+|          17 |         18 |
++-------------+------------+
+5 rows in set (0.00 sec)
+
+mysql> desc employee_meetingmany1;
++-------------+------------+------+-----+---------+-------+
+| Field       | Type       | Null | Key | Default | Extra |
++-------------+------------+------+-----+---------+-------+
+| employee_id | bigint(20) | NO   | PRI | NULL    |       |
+| meeting_id  | bigint(20) | NO   | PRI | NULL    |       |
++-------------+------------+------+-----+---------+-------+
+2 rows in set (0.01 sec)
+
+mysql> desc employeemany1;
++-------------+--------------+------+-----+---------+-------+
+| Field       | Type         | Null | Key | Default | Extra |
++-------------+--------------+------+-----+---------+-------+
+| employee_id | bigint(20)   | NO   | PRI | NULL    |       |
+| firstname   | varchar(255) | YES  |     | NULL    |       |
+| lastname    | varchar(255) | YES  |     | NULL    |       |
++-------------+--------------+------+-----+---------+-------+
+3 rows in set (0.01 sec)
+
+mysql> desc meetingmany1;
++--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| meeting_id   | bigint(20)   | NO   | PRI | NULL    |       |
+| meeting_date | datetime     | YES  |     | NULL    |       |
+| subject      | varchar(255) | YES  |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+3 rows in set (0.01 sec)
+
+mysql>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
