@@ -1,0 +1,4 @@
+com\cts\springmvc\entity\Patient.class
+com\cts\springmvc\serviceImpl\PatientServiceImpl.class
+com\cts\springmvc\controller\PatientController.class
+com\cts\springmvc\daoImpl\PatientDAOImpl.class
